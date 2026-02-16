@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
+from pathlib import Path
 from omni.isaac.kit import SimulationApp
 
-ROBOT_USD   = "/home/june/cobot3/rover/sim/assets/robots/aau_rover/Mars_Rover.usd"
-# ROBOT_USD   = "/home/june/cobot3/rover/sim/assets/robots/aau_rover/AAU_Rover_With_Arm.usd"
-TERRAIN_USD = "/home/june/cobot3/rover/sim/assets/terrains/debug/debug1/terrain_merged.usd"
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+SIM_DIR    = SCRIPT_DIR.parent
+ROBOT_USD = SIM_DIR / "assets" / "robots" / "aau_rover" / "Mars_Rover.usd"
+TERRAIN_USD = SIM_DIR / "assets" / "terrains" / "debug" / "debug1" / "terrain_merged.usd"
 
 simulation_app = SimulationApp({"headless": False})
 
@@ -70,8 +70,8 @@ def apply_collision_to_terrain_meshes(stage, terrain_prefix="/World/Terrain"):
 world = World(stage_units_in_meters=1.0, physics_dt=1.0/60.0, rendering_dt=1.0/60.0)
 
 # 2) Load USDs
-add_reference_to_stage(TERRAIN_USD, "/World/Terrain")
-add_reference_to_stage(ROBOT_USD,   "/World/Rover")
+add_reference_to_stage(str(TERRAIN_USD), "/World/Terrain")
+add_reference_to_stage(str(ROBOT_USD),   "/World/Rover")
 
 # 3) Stage warm-up
 ctx = omni.usd.get_context()
