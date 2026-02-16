@@ -3,8 +3,8 @@
 
 from omni.isaac.kit import SimulationApp
 
-# ROBOT_USD   = "/home/june/cobot3/rover/sim/assets/robots/aau_rover/Mars_Rover.usd"
-ROBOT_USD   = "/home/june/cobot3/rover/sim/assets/robots/aau_rover/AAU_Rover_With_Arm.usd"
+ROBOT_USD   = "/home/june/cobot3/rover/sim/assets/robots/aau_rover/Mars_Rover.usd"
+# ROBOT_USD   = "/home/june/cobot3/rover/sim/assets/robots/aau_rover/AAU_Rover_With_Arm.usd"
 TERRAIN_USD = "/home/june/cobot3/rover/sim/assets/terrains/debug/debug1/terrain_merged.usd"
 
 simulation_app = SimulationApp({"headless": False})
