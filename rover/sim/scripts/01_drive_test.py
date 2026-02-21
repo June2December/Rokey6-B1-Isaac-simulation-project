@@ -4,8 +4,10 @@ from omni.isaac.kit import SimulationApp
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 SIM_DIR    = SCRIPT_DIR.parent
-ROBOT_USD = SIM_DIR / "assets" / "robots" / "aau_rover" / "Mars_Rover.usd"
+ROBOT_USD = SIM_DIR / "assets" / "robots" / "aau_rover_simple" / "mobile_manipulator_instance" / "rover_instance.usd"
 TERRAIN_USD = SIM_DIR / "assets" / "terrains" / "debug" / "debug1" / "terrain_merged.usd"
+ROBOT_CONTAINER = "/World/Robot"
+ROVER_PATH = f"{ROBOT_CONTAINER}/mobile_manipulator/rover"
 
 simulation_app = SimulationApp({"headless": False})
 
@@ -18,14 +20,19 @@ from omni.isaac.core.utils.stage import add_reference_to_stage
 from omni.isaac.core.articulations import Articulation
 
 
-def find_articulation_root(stage, prefix="/World/Rover"):
+def find_articulation_root(stage, prefix):
+    candidates = []
     for prim in stage.Traverse():
         if not prim.IsValid():
             continue
         p = str(prim.GetPath())
         if p.startswith(prefix) and prim.HasAPI(UsdPhysics.ArticulationRootAPI):
-            return p
-    return prefix
+            candidates.append(p)
+
+    if not candidates:
+        raise RuntimeError(f"No ArticulationRootAPI found under {prefix}")
+
+    return min(candidates, key=len)
 
 
 def add_basic_lights(stage):
@@ -71,7 +78,7 @@ world = World(stage_units_in_meters=1.0, physics_dt=1.0/60.0, rendering_dt=1.0/6
 
 # 2) Load USDs
 add_reference_to_stage(str(TERRAIN_USD), "/World/Terrain")
-add_reference_to_stage(str(ROBOT_USD),   "/World/Rover")
+add_reference_to_stage(str(ROBOT_USD), ROBOT_CONTAINER)
 
 # 3) Stage warm-up
 ctx = omni.usd.get_context()
@@ -79,11 +86,36 @@ for _ in range(120):
     simulation_app.update()
     time.sleep(0.01)
 stage = ctx.get_stage()
+# --- DEBUG: print actual prim paths under /World/Robot ---
+def print_tree(stage, root_path, max_depth=4):
+    root = stage.GetPrimAtPath(root_path)
+    print(f"[DEBUG] root valid? {root.IsValid()}  path={root_path}")
+    if not root.IsValid():
+        return
+    def rec(prim, depth):
+        if depth > max_depth:
+            return
+        print("  " * depth + f"- {prim.GetPath()} ({prim.GetTypeName()})")
+        for c in prim.GetChildren():
+            rec(c, depth + 1)
+    rec(root, 0)
+
+print_tree(stage, ROBOT_CONTAINER, max_depth=6)
+# --- DEBUG end ---
+print("[DEBUG] Does ROVER_PATH exist? ->", stage.GetPrimAtPath(ROVER_PATH).IsValid(), ROVER_PATH)
+
+container_prim = stage.GetPrimAtPath(ROBOT_CONTAINER)
+print("[DEBUG] Container valid? ->", container_prim.IsValid(), ROBOT_CONTAINER)
+if container_prim.IsValid():
+    print("[DEBUG] Children of container:")
+    for c in container_prim.GetChildren():
+        print(" -", c.GetPath())
 
 from pxr import UsdGeom, Gf
 
-rover_prim = stage.GetPrimAtPath("/World/Rover")
-
+rover_prim = stage.GetPrimAtPath(ROVER_PATH)
+if not rover_prim.IsValid():
+    raise RuntimeError(f"ROVER_PATH invalid: {ROVER_PATH} (check printed children paths above)")
 xform = UsdGeom.Xformable(rover_prim)
 
 # 기존 transform이 있으면 덮어쓰기
@@ -103,7 +135,7 @@ add_basic_lights(stage)
 apply_collision_to_terrain_meshes(stage, "/World/Terrain")
 
 # 6) Articulation path
-arti_root = find_articulation_root(stage, "/World/Rover")
+arti_root = find_articulation_root(stage, ROVER_PATH)
 print("[INFO] articulation prim_path =", arti_root)
 
 # 7) Articulation
