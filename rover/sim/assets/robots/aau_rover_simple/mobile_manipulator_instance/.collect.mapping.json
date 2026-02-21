@@ -1,0 +1,47 @@
+{
+    "version": "1.0",
+    "file_records": [
+        {
+            "source_url": "/home/june/cobot3/Rokey6-B1-Isaac-simulation-project/rover/sim/assets/robots/aau_rover_simple/localhost/NVIDIA/Materials/vMaterials_2/Metal/Aluminum_Brushed.mdl",
+            "source_hash": "1b612bf839d355b30350a93c1eec618326e48b97",
+            "target_url": "./localhost/NVIDIA/Materials/vMaterials_2/Metal/Aluminum_Brushed.mdl",
+            "target_hash": "9a952bdc204019917d7195d2448ac0c2aa87aa8d"
+        },
+        {
+            "source_url": "/home/june/cobot3/Rokey6-B1-Isaac-simulation-project/rover/sim/assets/robots/aau_rover_simple/localhost/NVIDIA/Materials/vMaterials_2/Metal/Copper_Hammered.mdl",
+            "source_hash": "8fd4889391d50bb8b8e15e0400e07e6259e4ab3a",
+            "target_url": "./localhost/NVIDIA/Materials/vMaterials_2/Metal/Copper_Hammered.mdl",
+            "target_hash": "45a3385fb2b44c2f7d5bc8894c2fb6bb8fe8fc3c"
+        },
+        {
+            "source_url": "/home/june/cobot3/Rokey6-B1-Isaac-simulation-project/rover/sim/assets/robots/aau_rover_simple/localhost/NVIDIA/Materials/vMaterials_2/Metal/textures/hammered_multi_R_rough_G_corrspots_B_metal.jpg",
+            "source_hash": "d0c8e8d59e4053af39a8336e971486a4db307ff3",
+            "target_url": "./localhost/NVIDIA/Materials/vMaterials_2/Metal/textures/hammered_multi_R_rough_G_corrspots_B_metal.jpg",
+            "target_hash": "29cc375edae724cc482f93a7dfdd9e0dfcffeee3"
+        },
+        {
+            "source_url": "/home/june/cobot3/Rokey6-B1-Isaac-simulation-project/rover/sim/assets/robots/aau_rover_simple/localhost/NVIDIA/Materials/vMaterials_2/Metal/textures/brushed_metal_linear_R_rough_G_scratchvar_B_impurities.jpg",
+            "source_hash": "be611345b41b233ee34e36e320ebe706b3c199cf",
+            "target_url": "./localhost/NVIDIA/Materials/vMaterials_2/Metal/textures/brushed_metal_linear_R_rough_G_scratchvar_B_impurities.jpg",
+            "target_hash": "bce3153a34aa92359cdbef7f70aca7b112a4105d"
+        },
+        {
+            "source_url": "/home/june/cobot3/Rokey6-B1-Isaac-simulation-project/rover/sim/assets/robots/aau_rover_simple/localhost/NVIDIA/Materials/vMaterials_2/Metal/textures/hammered_multi_R_pit_G_ao_B_hammer.jpg",
+            "source_hash": "d54959e44cba307befda4516dba9f059a37500ec",
+            "target_url": "./localhost/NVIDIA/Materials/vMaterials_2/Metal/textures/hammered_multi_R_pit_G_ao_B_hammer.jpg",
+            "target_hash": "fedf626bce22ca3ec493e2db2acc349edf55747c"
+        },
+        {
+            "source_url": "/home/june/cobot3/Rokey6-B1-Isaac-simulation-project/rover/sim/assets/robots/aau_rover_simple/localhost/NVIDIA/Materials/vMaterials_2/Metal/textures/brushed_metal_linear_norm.jpg",
+            "source_hash": "c488d83697650dd0f4f47073787a924eb6240b74",
+            "target_url": "./localhost/NVIDIA/Materials/vMaterials_2/Metal/textures/brushed_metal_linear_norm.jpg",
+            "target_hash": "157b13dc5d637668cd55266331ce105756ad2ef9"
+        },
+        {
+            "source_url": "/home/june/cobot3/Rokey6-B1-Isaac-simulation-project/rover/sim/assets/robots/aau_rover_simple/localhost/NVIDIA/Materials/vMaterials_2/Metal/textures/hammered_norm.jpg",
+            "source_hash": "cb02c020a872a4c4f3f7bf796a2a1070c5bd3d7a",
+            "target_url": "./localhost/NVIDIA/Materials/vMaterials_2/Metal/textures/hammered_norm.jpg",
+            "target_hash": "a63522d1e1ec6fd6c46c2c8fb2e776ffab16ed3d"
+        }
+    ]
+}
