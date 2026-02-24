@@ -43,12 +43,13 @@ from skrl.agents.torch.base import Agent              # noqa: E402
 from skrl.utils import set_seed                       # noqa: E402
 import omni.usd                                       # noqa: E402
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import rover_envs                                     # noqa: E402
-import rover_envs.envs.navigation.robots              # noqa: E402
+import rover_envs.envs.navigation.robots.aau_rover
 from rover_envs.envs.navigation.mdp.observations import get_robot_world_pos  # noqa: E402
 from rover_envs.learning.agents import create_agent   # noqa: E402
 from rover_envs.utils.config import parse_skrl_cfg    # noqa: E402
-from rover_envs.utils.logging_utils import (          # noqa: E402
+from rover_envs.utils.logging_utils import (
     configure_datarecorder, log_setup, video_record,
 )
 
@@ -59,8 +60,8 @@ enable_extension("isaacsim.ros2.bridge")
 
 # 2. Isaac Sim python3.11 rclpy 경로 우선 적용
 #    source /opt/ros/humble 이 python3.10 경로를 심어놓을 수 있으므로 제거 후 삽입
-ROS2_RCLPY_DIR = "/home/rokey/isaacsim/exts/isaacsim.ros2.bridge/humble/rclpy"
-ROS2_LIB_DIR   = "/home/rokey/isaacsim/exts/isaacsim.ros2.bridge/humble/lib"
+ROS2_RCLPY_DIR = os.environ["ROS2_RCLPY_DIR"]
+ROS2_LIB_DIR   = os.environ["ROS2_LIB_DIR"]
 sys.path = [p for p in sys.path if "python3.10" not in p and "/opt/ros" not in p]
 sys.path.insert(0, ROS2_LIB_DIR)
 sys.path.insert(0, ROS2_RCLPY_DIR)
@@ -75,7 +76,7 @@ from std_msgs.msg import String                       # noqa: E402
 from sensor_msgs.msg import Image                     # noqa: E402
 
 # ── 미션 유틸리티 ──────────────────────────────────────────────────────────────
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+# sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from mission import (                                 # noqa: E402
     spawn_basecamp_marker,
     get_basecamp_center,
