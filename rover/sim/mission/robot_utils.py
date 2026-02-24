@@ -30,6 +30,6 @@ def teleport_to_basecamp(raw_env: ManagerBasedRLEnv, env_idx: int,
 
     root_state[env_idx, 0]    = tx
     root_state[env_idx, 1]    = ty
-    root_state[env_idx, 2]    = terrain_z + 0.5  # 지형 위 0.5m
+    root_state[env_idx, 2]    = terrain_z + 1.5  # 지형 위 0.5m
     root_state[env_idx, 7:13] = 0.0               # 속도 초기화
     robot.write_root_state_to_sim(root_state)

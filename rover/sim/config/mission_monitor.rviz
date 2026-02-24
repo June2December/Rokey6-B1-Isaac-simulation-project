@@ -1,0 +1,148 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Camera Robot01
+        - /Camera Robot11
+        - /Robot0 위치1
+        - /Robot1 위치1
+        - /미션 상태 텍스트1
+        - /TF1
+        - /Grid1
+      Splitter Ratio: 0.5
+    Tree Height: 700
+
+  - Class: rviz_common/Views
+    Name: Views
+    Splitter Ratio: 0.5
+
+Visualization Manager:
+  Class: ""
+  Displays:
+
+    # ── 카메라 Robot0 ─────────────────────────────────────────────────────────
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Name: "Camera Robot0"
+      Topic:
+        Depth: 3
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /robot0/camera/image_raw
+      Value: true
+
+    # ── 카메라 Robot1 ─────────────────────────────────────────────────────────
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Name: "Camera Robot1"
+      Topic:
+        Depth: 3
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /robot1/camera/image_raw
+      Value: true
+
+    # ── Robot0 위치 (빨강 화살표) ─────────────────────────────────────────────
+    - Class: rviz_default_plugins/Pose
+      Color: 255; 50; 50
+      Enabled: true
+      Head Length: 0.8
+      Head Radius: 0.3
+      Name: "Robot0 위치"
+      Shaft Length: 1.5
+      Shaft Radius: 0.1
+      Shape: Arrow
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /robot0/pose
+      Value: true
+
+    # ── Robot1 위치 (파랑 화살표) ─────────────────────────────────────────────
+    - Class: rviz_default_plugins/Pose
+      Color: 50; 50; 255
+      Enabled: true
+      Head Length: 0.8
+      Head Radius: 0.3
+      Name: "Robot1 위치"
+      Shaft Length: 1.5
+      Shaft Radius: 0.1
+      Shape: Arrow
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /robot1/pose
+      Value: true
+
+    # ── TF 트리 ───────────────────────────────────────────────────────────────
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Update Interval: 0
+      Value: true
+
+    # ── Grid ──────────────────────────────────────────────────────────────────
+    - Class: rviz_default_plugins/Grid
+      Alpha: 0.5
+      Cell Size: 5
+      Color: 160; 160; 164
+      Enabled: true
+      Name: Grid
+      Plane: XY
+      Plane Cell Count: 30
+      Reference Frame: <Fixed Frame>
+      Value: true
+
+  Enabled: true
+  Global Options:
+    Background Color: 20; 20; 20
+    Fixed Frame: world
+    Frame Rate: 30
+
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/Interact
+      Hide Inactive: false
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Name: Current View
+    Saved: ~
+
+Window Geometry:
+  Camera Robot0:
+    collapsed: false
+    Height: 300
+    Width: 480
+    X: 0
+    Y: 30
+  Camera Robot1:
+    collapsed: false
+    Height: 300
+    Width: 480
+    X: 490
+    Y: 30
+  Displays:
+    collapsed: false
+  Height: 1080
+  Width: 1920
+  X: 0
+  Y: 0

@@ -4,10 +4,10 @@ from omni.isaac.kit import SimulationApp
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 SIM_DIR    = SCRIPT_DIR.parent
-ROBOT_USD = SIM_DIR / "assets" / "robots" / "aau_rover_simple" / "mobile_manipulator_instance" / "rover_instance.usd"
+ROBOT_USD = SIM_DIR / "assets" / "robots" / "aau_rover" / "Mars_Rover.usd"
 TERRAIN_USD = SIM_DIR / "assets" / "terrains" / "debug" / "debug1" / "terrain_merged.usd"
 ROBOT_CONTAINER = "/World/Robot"
-ROVER_PATH = f"{ROBOT_CONTAINER}/mobile_manipulator/rover"
+ROVER_PATH = f"{ROBOT_CONTAINER}"
 
 simulation_app = SimulationApp({"headless": False})
 
@@ -158,7 +158,7 @@ if len(wheel_ids) == 0:
 wheel_vel = np.full((len(wheel_ids),), 6.0, dtype=np.float32)
 
 # 9) Run
-for step in range(1200):
+for step in range(120000):
     rover.set_joint_velocities(wheel_vel, joint_indices=np.array(wheel_ids, dtype=np.int32))
     world.step(render=True)
 
