@@ -3,3 +3,17 @@ __pycache__/
 *.pyc
 
 */terrains/*releases/*.zip
+releases/*.zip
+
+# python
+__pycache__/
+*.pyc
+
+# release zips
+releases/*.zip
+
+# terrain assets (do not commit)
+rover/sim/rover_envs/assets/terrains/**
+
+# thumbnails
+**/.thumbs/
