@@ -12,29 +12,47 @@
 
 ## 📦 Terrain Assets Setup
 
-This project uses external terrain assets to keep the repository lightweight.
+Due to GitHub file size limits, terrain assets are not included in the repository.
 
 ### 1. Download assets
 
-Download from Release:
+Download from Releases:
 
 👉 https://github.com/June2December/Rokey6-B1-Isaac-simulation-project/releases
 
 Download:
 
-terrain_assets.zip
+mars_terrain_assets.zip
+
+---
 
 ### 2. Extract
 
-Extract to:
+Extract the zip file to:
 
-rover/sim/rover_envs/assets/terrains/
+rover/sim/rover_envs/assets/terrains/mars/
+
+---
+
+### 3. Verify structure
 
 Final structure should look like:
 
 assets/
 └── terrains/
-    └── debug/
-        └── debug1/
+    └── mars/
+        └── terrain1/
+            ├── terrain_merged.usd
+            ├── terrain_only.usd
+            ├── rocks_merged.usd
+            └── SubUSDs/
 
-### 3. Run simulation
+---
+
+### 4. Run simulation
+# Executing simulation with .sh
+~/Rokey6-B1-Isaac-simulation-project/rover/sim/run_ros2.sh
+
+# Executing monitoring node, after ros_set
+source /opt/ros/humble/setup.bash
+python3 ~/Rokey6-B1-Isaac-simulation-project/rover/sim/scripts/mission_monitor.py
