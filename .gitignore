@@ -1,19 +1,25 @@
-
+# python cache
 __pycache__/
 *.pyc
 
-*/terrains/*releases/*.zip
+# release zip files
 releases/*.zip
 
-# python
-__pycache__/
-*.pyc
-
-# release zips
-releases/*.zip
-
-# terrain assets (do not commit)
-rover/sim/rover_envs/assets/terrains/**
-
-# thumbnails
+# mac / thumbnails
 **/.thumbs/
+
+# =========================
+# Ignore ONLY heavy terrain data
+# =========================
+
+# mars heavy assets
+rover/sim/rover_envs/assets/terrains/mars/terrain1/**
+
+# debug heavy assets
+rover/sim/rover_envs/assets/terrains/debug/debug1/**
+
+# =========================
+# Keep terrain python configs tracked
+# =========================
+!rover/sim/rover_envs/assets/terrains/**.py
+!rover/sim/rover_envs/assets/terrains/**/__init__.py
