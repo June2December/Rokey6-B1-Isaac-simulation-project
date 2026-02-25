@@ -39,7 +39,7 @@ class MissionMonitor(Node):
         self.create_subscription(PoseStamped, "/robot0/pose", lambda m: self._on_pose(0, m), 10)
         self.create_subscription(PoseStamped, "/robot1/pose", lambda m: self._on_pose(1, m), 10)
 
-        self.create_timer(1.0, self._display)  # 1Hz 화면 갱신
+        self.create_timer(0.1, self._display)  # 1Hz 화면 갱신
 
     def _on_status(self, msg):
         try:
@@ -56,9 +56,14 @@ class MissionMonitor(Node):
         if idx in self._prev_pos:
             px, py = self._prev_pos[idx]
             dt = now - self._prev_time[idx]
-            if dt > 0.05:  # 너무 짧은 간격 무시
+            if dt > 0:  # 0.05 조건 제거
                 dist = ((x - px) ** 2 + (y - py) ** 2) ** 0.5
-                self.speeds[idx] = dist / dt
+                raw_speed = dist / dt
+
+                if idx in self.speeds:
+                    self.speeds[idx] = 0.05 * raw_speed + 0.95 * self.speeds[idx]
+                else:
+                    self.speeds[idx] = raw_speed
 
         self._prev_pos[idx]  = (x, y)
         self._prev_time[idx] = now

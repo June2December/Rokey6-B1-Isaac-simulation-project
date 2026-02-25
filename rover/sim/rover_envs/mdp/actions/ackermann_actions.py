@@ -272,4 +272,4 @@ def ackermann(lin_vel, ang_vel, cfg, device):
     # Convert wheel velocities from m/s to rad/s
     wheel_velocities = wheel_velocities / (wheel_radius*2)
 
-    return steering_angles, wheel_velocities
+    return 1.2 * steering_angles, 2. * wheel_velocities

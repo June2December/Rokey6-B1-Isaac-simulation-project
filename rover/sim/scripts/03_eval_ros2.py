@@ -92,7 +92,7 @@ from mission import (                                 # noqa: E402
 # ─────────────────────────────────────────────────────────────────────────────
 NUM_ROBOTS             = 2
 MINERALS_PER_ROBOT     = 5
-MINERAL_COLLECT_RADIUS = 1.0
+MINERAL_COLLECT_RADIUS = 0.5
 BASEMENT_RADIUS        = 2.0
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -295,7 +295,8 @@ def run_mission(env, agent, simulation_app, cx, cy, ros_node: MissionPublisher):
 
             if st["phase"] == "collect":
                 dist = torch.norm(rx - all_target_xy[i]).item()
-                if dist < MINERAL_COLLECT_RADIUS:
+                angle = raw_env.command_manager.get_command("target_pose")[i, 3].item()
+                if dist < MINERAL_COLLECT_RADIUS and abs(angle) < 0.2:
                     st["collected"] += 1
                     print(f"\n  Robot{i} 💎 광물 #{st['collected']} 수집! "
                           f"({dist:.2f}m) [{st['collected']}/{MINERALS_PER_ROBOT}]")
