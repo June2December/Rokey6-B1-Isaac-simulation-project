@@ -47,6 +47,19 @@ assets/
             ├── rocks_merged.usd
             └── SubUSDs/
 
+🔧 Environment Variables Setup (Required)
+
+run_ros2.sh 실행 전에 아래 환경변수가 설정되어 있어야 합니다.
+
+export ISAACLAB_DIR=$HOME/IsaacLab
+export ROS2_BRIDGE_DIR=$HOME/isaacsim/exts/isaacsim.ros2.bridge/humble
+
+매번 설정하기 번거롭다면 .bashrc에 추가합니다.
+
+echo 'export ISAACLAB_DIR=$HOME/IsaacLab' >> ~/.bashrc
+echo 'export ROS2_BRIDGE_DIR=$HOME/isaacsim/exts/isaacsim.ros2.bridge/humble' >> ~/.bashrc
+source ~/.bashrc
+
 ---
 
 ### 4. Run simulation
