@@ -22,38 +22,39 @@ models:
       encoder_activation: "leaky_relu"
 
 
-#   learning_rate_scheduler: "KLAdaptiveRL"
 agent:
   rollouts: 60
   learning_epochs: 4
   mini_batches: 60
   discount_factor: 0.99
   lambda: 0.95
-  learning_rate: 1.e-4
 
-  #learning_rate_scheduler: "None"
-  #learning_rate_scheduler_kwargs: null
-  #state_preprocessor: "None"
-  #state_preprocessor_kwargs: null
-  #value_preprocessor: "None"
-  #value_preprocessor_kwargs: null
+  # TRPO는 정책을 CG+line search로 업데이트 → value network optimizer에만 learning rate 사용
+  value_learning_rate: 1.e-4
+  learning_rate_scheduler: "KLAdaptiveRL"
+  learning_rate_scheduler_kwargs:
+    kl_threshold: 0.008
+
   random_timesteps: 0
   learning_starts: 0
-  #grad_norm_clip: 0.5 #1.0
-  #ratio_clip: 0.2
-  #value_clip: 0.2
-  #clip_predicted_values: True
-  #entropy_loss_scale: 0.0
+  grad_norm_clip: 0.5
   value_loss_scale: 1.0
-  #kl_threshold: 0.008
-  #rewards_shaper_scale: null
+
+  # TRPO Trust Region (Conjugate Gradient + Line Search)
+  damping: 0.1                  # Fisher-vector product 안정화
+  max_kl_divergence: 0.01       # trust region 크기 (KL 제약)
+  conjugate_gradient_steps: 10  # CG solver 반복 횟수
+  max_backtrack_steps: 10       # line search backtrack 최대 횟수
+  accept_ratio: 0.5             # line search 최소 개선 비율
+  step_fraction: 1.0            # 계산된 step의 적용 비율
+
   # logging and checkpoint
   experiment:
     directory: "rover"
-    experiment_name: ""
+    experiment_name: "trpo_rover"
     write_interval: 40
     checkpoint_interval: 400
     wandb: True             # whether to use Weights & Biases
 
 trainer:
-  timesteps: 200000
+  timesteps: 1000000

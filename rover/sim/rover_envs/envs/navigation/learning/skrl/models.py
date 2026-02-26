@@ -5,7 +5,8 @@ from skrl.models.torch.deterministic import DeterministicMixin
 from skrl.models.torch.gaussian import GaussianMixin
 
 # Import general model utilities
-from rover_envs.learning.models import MODEL_REGISTRY, get_activation, register_model
+from rover_envs.learning.models import get_activation, register_model
+from .Gaussian_NN_Conv import GaussianNNHeightmapEncoder  # noqa: F401
 
 
 class HeightmapEncoder(nn.Module):
@@ -75,8 +76,6 @@ class ConvHeightmapEncoder(nn.Module):
         for layer in self.mlps:
             x = layer(x)
         return x
-
-
 
 
 
@@ -573,11 +572,116 @@ class ValueNetworkConvDict(DeterministicMixin, BaseModel):
         self.mlp.append(nn.Linear(in_channels, 1))
 
     def compute(self, states, role="actor"):
-        
+
         states = self.tensor_to_space(states["states"], self.observation_space)
         encoder_output = self.encoder(states["height_scan"])
         x = torch.cat([states["actions"], states["distance"], states["heading"], states["angle_diff"], encoder_output], dim=1)
 
+
+        for layer in self.mlp:
+            x = layer(x)
+
+        return x, {}
+
+
+@register_model("GaussianNeuralNetworkConv")
+class GaussianPolicyNNConv(GaussianMixin, BaseModel):
+    """Gaussian policy network using GaussianNNHeightmapEncoder (Gaussian kernel encoder)."""
+
+    def __init__(
+        self,
+        observation_space,
+        action_space,
+        device,
+        mlp_input_size=5,
+        mlp_layers=[256, 160, 128],
+        mlp_activation="leaky_relu",
+        encoder_input_size=None,
+        encoder_layers=[8, 16, 32, 64],
+        encoder_activation="leaky_relu",
+        **kwargs,
+    ):
+        BaseModel.__init__(self, observation_space, action_space, device)
+        GaussianMixin.__init__(
+            self, clip_actions=True, clip_log_std=True, min_log_std=-20.0, max_log_std=2.0, reduction="sum"
+        )
+
+        self.mlp_input_size = mlp_input_size
+        self.encoder_input_size = encoder_input_size
+
+        in_channels = self.mlp_input_size
+        if self.encoder_input_size is not None:
+            self.encoder = GaussianNNHeightmapEncoder(self.encoder_input_size, encoder_layers, encoder_activation)
+            in_channels += self.encoder.out_features
+
+        self.mlp = nn.ModuleList()
+        for feature in mlp_layers:
+            self.mlp.append(nn.Linear(in_channels, feature))
+            self.mlp.append(get_activation(mlp_activation))
+            in_channels = feature
+
+        action_size = action_space.shape[0]
+        self.mlp.append(nn.Linear(in_channels, action_size))
+        self.mlp.append(nn.Tanh())
+        self.log_std_parameter = nn.Parameter(torch.zeros(action_size))
+
+    def compute(self, states, role="actor"):
+        if self.encoder_input_size is None:
+            x = states["states"]
+        else:
+            encoder_output = self.encoder(states["states"][:, self.mlp_input_size - 1:-1])
+            x = states["states"][:, 0:self.mlp_input_size]
+            x = torch.cat([x, encoder_output], dim=1)
+
+        for layer in self.mlp:
+            x = layer(x)
+
+        return x, self.log_std_parameter, {}
+
+
+@register_model("DeterministicNeuralNetworkConv")
+class DeterministicValueNNConv(DeterministicMixin, BaseModel):
+    """Deterministic value network using GaussianNNHeightmapEncoder (Gaussian kernel encoder)."""
+
+    def __init__(
+        self,
+        observation_space,
+        action_space,
+        device,
+        mlp_input_size=5,
+        mlp_layers=[256, 160, 128],
+        mlp_activation="leaky_relu",
+        encoder_input_size=None,
+        encoder_layers=[8, 16, 32, 64],
+        encoder_activation="leaky_relu",
+        **kwargs,
+    ):
+        BaseModel.__init__(self, observation_space, action_space, device)
+        DeterministicMixin.__init__(self, clip_actions=False)
+
+        self.mlp_input_size = mlp_input_size
+        self.encoder_input_size = encoder_input_size
+
+        in_channels = self.mlp_input_size
+        if self.encoder_input_size is not None:
+            self.encoder = GaussianNNHeightmapEncoder(self.encoder_input_size, encoder_layers, encoder_activation)
+            in_channels += self.encoder.out_features
+
+        self.mlp = nn.ModuleList()
+        for feature in mlp_layers:
+            self.mlp.append(nn.Linear(in_channels, feature))
+            self.mlp.append(get_activation(mlp_activation))
+            in_channels = feature
+
+        self.mlp.append(nn.Linear(in_channels, 1))
+
+    def compute(self, states, role="actor"):
+        if self.encoder_input_size is None:
+            x = states["states"]
+        else:
+            x = states["states"][:, :self.mlp_input_size]
+            encoder_output = self.encoder(states["states"][:, self.mlp_input_size - 1:-1])
+            x = torch.cat([x, encoder_output], dim=1)
 
         for layer in self.mlp:
             x = layer(x)

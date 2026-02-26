@@ -7,6 +7,8 @@
 """Utility functions for parsing skrl configuration files."""
 
 import yaml
+from skrl.resources.schedulers.torch import KLAdaptiveRL  # noqa: F401 — used via eval() in convert_skrl_cfg
+from skrl.resources.preprocessors.torch import RunningStandardScaler  # noqa: F401 — used via eval() in convert_skrl_cfg
 
 __all__ = ["parse_skrl_cfg"]
 

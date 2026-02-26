@@ -1,0 +1,11 @@
+1.run_ros2.sh 를 trpo 에이전트를 활용하여 실행하는데 에러 발생
+-KLadaptiveRL을 못 찾음(.yaml에 정의)
+2.models.py에 .yaml에 정의된 함수 작성
+3.config.py
+./rover/sim/rover_envs/utils/config.py에서 adaptivelr import 진행.
+
+
+4.다른 디렉터리에서 isaaclab 환경을 틀고, python3 eval.py --agent TRPO를 실행했을 때, 알게된 경로를 아래에 제시함. 문제 해결에 도움될 수 있음
+/home/markch/IsaacLab/_isaac_sim/kit/python/lib/python3.11/site-packages/skrl/resources/schedulers/torch/__init__.py
+이 디렉터리에서 KLAdaptiveRL을 정의
+

@@ -10,7 +10,9 @@ gym.register(
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": env_cfg.AAURoverEnvCfg,
-        "best_model_path": f"{os.path.dirname(__file__)}/policies/best_agent_heightmap.pt",
+        # "best_model_path": f"{os.path.dirname(__file__)}/policies/best_agent_heightmap.pt",
+        # "best_model_path": f"{os.path.dirname(__file__)}/policies/best_agent_ppo.pt",
+        "best_model_path": f"{os.path.dirname(__file__)}/policies/best_agent_trpo.pt",
         "skrl_cfgs": {
             "PPO": f"{os.path.dirname(__file__)}/../../learning/skrl/configs/rover_ppo.yaml",
             "TRPO": f"{os.path.dirname(__file__)}/../../learning/skrl/configs/rover_trpo.yaml",

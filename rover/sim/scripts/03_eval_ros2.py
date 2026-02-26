@@ -4,6 +4,7 @@ import argparse
 import random
 import sys
 import threading
+import time
 import json
 import os
 
@@ -19,7 +20,7 @@ parser.add_argument("--video_interval", type=int, default=2000)
 parser.add_argument("--num_envs",       type=int, default=2)
 parser.add_argument("--task",           type=str, default="AAURoverEnv-v0")
 parser.add_argument("--seed",           type=int, default=None)
-parser.add_argument("--agent",          type=str, default="PPO")
+parser.add_argument("--agent",          type=str, default="TRPO")
 parser.add_argument("--checkpoint",     type=str, default=None)
 parser.add_argument("--dataset_dir",    type=str, default="./datasets")
 parser.add_argument("--dataset_name",   type=str, default=None)
@@ -77,6 +78,7 @@ from sensor_msgs.msg import Image                     # noqa: E402
 
 # ── 미션 유틸리티 ──────────────────────────────────────────────────────────────
 # sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from firebase_db import init_firebase, upload_robot_status  # noqa: E402
 from mission import (                                 # noqa: E402
     spawn_basecamp_marker,
     get_basecamp_center,
@@ -226,7 +228,8 @@ def run_mission(env, agent, simulation_app, cx, cy, ros_node: MissionPublisher):
     robot_states     = {i: new_state() for i in range(NUM_ROBOTS)}
     pending_teleport: set = set()
 
-    step = 0
+    step       = 0
+    start_time = time.time()
     print("\n" + "="*60)
     print(f"🚀 듀얼 로봇 미션 시작! 각자 광물 {MINERALS_PER_ROBOT}개씩 독립 수집")
     print(f"   베이스캠프: ({cx:.1f}, {cy:.1f})")
@@ -323,6 +326,9 @@ def run_mission(env, agent, simulation_app, cx, cy, ros_node: MissionPublisher):
                     print(f"  [Step {step}] Robot{i} 에피소드 종료({reason}) → 재위치 예약")
                     pending_teleport.add(i)
 
+        if step % 100 == 0:
+            upload_robot_status(step, time.time() - start_time, robot_states, actions)
+
         step += 1
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -373,6 +379,8 @@ def main():
 
     spawn_basecamp_marker(stage, cx, cy, visual_radius=10.0)
     setup_dual_viewports(stage)
+
+    init_firebase()
 
     rclpy.init()
     ros_node = MissionPublisher()

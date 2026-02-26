@@ -1,6 +1,7 @@
 # python cache
 __pycache__/
 *.pyc
+*.json
 
 # release zip files
 releases/*.zip

@@ -27,6 +27,7 @@ from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise  # noqa: F401
 import rover_envs
 import rover_envs.envs.navigation.mdp as mdp
 from rover_envs.assets.terrains.debug.debug_terrains import DebugTerrainSceneCfg  # noqa: F401
+# from rover_envs.assets.terrains.debug.debug1 import DebugTerrainSceneCfg  # noqa: F401
 from rover_envs.assets.terrains.mars import MarsTerrainSceneCfg  # noqa: F401
 from rover_envs.envs.navigation.utils.terrains.commands_cfg import TerrainBasedPositionCommandCfg  # noqa: F401
 from rover_envs.envs.navigation.utils.terrains.terrain_importer import RoverTerrainImporter  # noqa: F401
@@ -72,7 +73,8 @@ class RoverSceneCfg(MarsTerrainSceneCfg):
         prim_path="{ENV_REGEX_NS}/Robot/Body",
         offset=RayCasterCfg.OffsetCfg(pos=[0.0, 0.0, 10.0]),
         ray_alignment="yaw",
-        pattern_cfg=patterns.GridPatternCfg(resolution=0.05, size=[5.0, 5.0]),
+        # pattern_cfg=patterns.GridPatternCfg(resolution=0.05, size=[5.0, 5.0]),
+        pattern_cfg=patterns.GridPatternCfg(resolution=0.5, size=[5.0, 5.0]),
         debug_vis=False,
         mesh_prim_paths=["/World/terrain/hidden_terrain"],
         max_distance=100.0,
