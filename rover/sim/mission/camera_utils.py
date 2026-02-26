@@ -21,7 +21,7 @@ def attach_custom_camera(stage, env_idx: int, view_type: str):
         return None
 
     if view_type == "1P":
-        translate, rotate, focal = (2.5, 0.0, 0.4),  (90.0, 0.0, -90.0), 15.0
+        translate, rotate, focal = (-1.5, 0.0, 0.4),  (90.0, 0.0, -90.0), 15.0
     else:
         translate, rotate, focal = (-2.5, 0.0, 1.2), (90.0, 0.0,  90.0), 24.0
 

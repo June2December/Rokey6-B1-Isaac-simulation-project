@@ -64,7 +64,7 @@ def spawn_basecamp_marker(stage, cx: float, cy: float, visual_radius: float = 10
         prim = stage.GetPrimAtPath(prim_path)
         prim.GetReferences().AddReference(rocket_path, "/Rocket")
         _safe_xform(stage, prim_path,
-                    translate=(cx, cy, 0.0), scale=(5.0, 5.0, 5.0))
+                    translate=(cx, cy, -15.0), scale=(7.0, 7.0, 5.5))
         print(f"[Scene] 로켓 배치: ({cx:.1f}, {cy:.1f})  경로: {prim_path}")
     else:
         print(f"[Scene] Rocket_default.usd 없음 → 실린더 폴백: {rocket_path}")
