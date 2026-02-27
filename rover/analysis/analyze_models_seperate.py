@@ -42,7 +42,7 @@ if len(sys.argv) >= 3:
 
 # 스크립트 위치 기준으로 charts 디렉터리 고정
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-out_dir = os.path.join(SCRIPT_DIR, "charts")
+out_dir = os.path.join(SCRIPT_DIR, "result_charts")
 
 if os.path.isdir(target):
     csv_files = sorted(glob.glob(os.path.join(target, "*.csv")))

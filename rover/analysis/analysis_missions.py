@@ -28,7 +28,7 @@ plt.rcParams["axes.unicode_minus"] = False   # 마이너스 기호 깨짐 방지
 
 ROBOT_COLORS = ["#2196F3", "#FF5722"]   # Robot0: 파랑, Robot1: 주황
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "mission_data")
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
 
 
 def find_latest(pattern):
@@ -257,40 +257,49 @@ def plot_graphs(event_df: pd.DataFrame, log_df: pd.DataFrame, results: dict, ts:
     ax4.set_xlabel("라운드")
     ax4.set_ylabel("소요 시간 (초)")
 
-    bar_x, bar_h, bar_c, bar_labels = [], [], [], []
-    offset = 0
-    for rid, color in enumerate(ROBOT_COLORS):
+    # 로봇별 라운드 소요시간 수집: {round_num: duration_s}
+    robot_round_durs = {}
+    for rid in range(len(ROBOT_COLORS)):
         rob_min = minerals[minerals["robot_id"] == rid].sort_values("elapsed_s")
         rob_ret = returns[returns["robot_id"] == rid].sort_values("elapsed_s")
-        if rob_min.empty:
-            continue
-        prev_t = rob_min["elapsed_s"].min()
-        for _, row in rob_ret.iterrows():
-            if row["elapsed_s"] > prev_t:
-                dur = row["elapsed_s"] - prev_t
-                bar_x.append(offset)
-                bar_h.append(dur)
-                bar_c.append(color)
-                bar_labels.append(f"R{int(row['round'])}\nRob{rid}")
-                offset += 1
-                prev_t = row["elapsed_s"]
+        durs = {}
+        if not rob_min.empty:
+            prev_t = rob_min["elapsed_s"].min()
+            for _, row in rob_ret.iterrows():
+                if row["elapsed_s"] > prev_t:
+                    durs[int(row["round"])] = row["elapsed_s"] - prev_t
+                    prev_t = row["elapsed_s"]
+        robot_round_durs[rid] = durs
 
-    if bar_x:
-        bars = ax4.bar(bar_x, bar_h, color=bar_c, edgecolor="#cccccc",
-                       linewidth=0.5, width=0.6)
-        ax4.set_xticks(bar_x)
-        ax4.set_xticklabels(bar_labels, fontsize=7, color="black")
-        for bar, h in zip(bars, bar_h):
-            m, s = divmod(int(h), 60)
-            ax4.text(bar.get_x() + bar.get_width() / 2, h + 1,
-                     f"{m}:{s:02d}", ha="center", va="bottom",
-                     fontsize=7, color="black")
-        # 평균선
-        avg_dur = np.mean(bar_h)
-        ax4.axhline(avg_dur, color="#555555", linestyle="--", linewidth=1,
-                    alpha=0.7, label=f"평균 {avg_dur:.0f}초")
-        ax4.legend(fontsize=8, facecolor="white", edgecolor="#cccccc",
-                   labelcolor="black")
+    all_rounds = sorted(set(r for durs in robot_round_durs.values() for r in durs))
+
+    if all_rounds:
+        x_pos   = np.arange(len(all_rounds))
+        bottoms = np.zeros(len(all_rounds))
+        for rid, color in enumerate(ROBOT_COLORS):
+            heights = np.array([robot_round_durs[rid].get(r, 0.0) for r in all_rounds])
+            ax4.bar(x_pos, heights, bottom=bottoms, color=color,
+                    edgecolor="#cccccc", linewidth=0.5, width=0.6,
+                    label=f"Robot {rid}")
+            # 각 층 중앙에 소요시간 표시
+            for xi, (h, b) in enumerate(zip(heights, bottoms)):
+                if h > 2:
+                    m, s = divmod(int(h), 60)
+                    ax4.text(xi, b + h / 2, f"{m}:{s:02d}",
+                             ha="center", va="center", fontsize=7,
+                             color="white", fontweight="bold")
+            bottoms += heights
+
+        # 전체 합산 평균선
+        total_durs = [robot_round_durs[0].get(r, 0) + robot_round_durs[1].get(r, 0)
+                      for r in all_rounds]
+        avg_total = np.mean([d for d in total_durs if d > 0])
+        ax4.axhline(avg_total, color="#555555", linestyle="--", linewidth=1,
+                    alpha=0.7, label=f"평균 합산 {avg_total:.0f}초")
+
+        ax4.set_xticks(x_pos)
+        ax4.set_xticklabels([f"R{r}" for r in all_rounds], fontsize=8, color="black")
+        ax4.legend(fontsize=8, facecolor="white", edgecolor="#cccccc", labelcolor="black")
     else:
         ax4.text(0.5, 0.5, "완료된 라운드 없음", transform=ax4.transAxes,
                  ha="center", va="center", color="#888888")
@@ -303,14 +312,35 @@ def plot_graphs(event_df: pd.DataFrame, log_df: pd.DataFrame, results: dict, ts:
     plt.show()
 
 
+def pick_file() -> str:
+    """logs/ 디렉터리의 mission_events_*.csv 목록을 보여주고 사용자가 선택하게 함."""
+    files = sorted(glob.glob(os.path.join(DATA_DIR, "mission_events_*.csv")))
+    if not files:
+        print(f"[Error] mission_events_*.csv 파일을 찾을 수 없습니다. ({DATA_DIR})")
+        sys.exit(1)
+
+    print("\n사용 가능한 파일 목록:")
+    for i, f in enumerate(files):
+        print(f"  [{i}] {os.path.basename(f)}")
+
+    while True:
+        try:
+            idx = int(input(f"\n번호를 입력하세요 (0~{len(files)-1}): ").strip())
+            if 0 <= idx < len(files):
+                return files[idx]
+        except (ValueError, EOFError):
+            pass
+        print("올바른 번호를 입력해주세요.")
+
+
 def main():
     if len(sys.argv) >= 2:
         event_path = sys.argv[1]
     else:
-        event_path = find_latest(os.path.join(DATA_DIR, "mission_events_*.csv"))
+        event_path = pick_file()
 
     if not event_path or not os.path.exists(event_path):
-        print(f"[Error] mission_events_*.csv 파일을 찾을 수 없습니다. ({DATA_DIR})")
+        print(f"[Error] 파일을 찾을 수 없습니다: {event_path}")
         sys.exit(1)
 
     print(f"[Analysis] 파일: {event_path}")
