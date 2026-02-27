@@ -62,7 +62,7 @@
     1. Rviz2 : 주행시 Rover 의 시점(image_raw)
     2. monitor node : 현재 주행정보 [수집 광물, 목표 위치까지 거리, 속도, 현 위치, 평균 수집량]
         
-        ![모니터링 캡쳐.png](attachment:0f31ca9e-5f61-4786-ace6-efaebaea6378:모니터링_캡쳐.png)
+        ![모니터링 캡쳐](images/monitoring_capture.png)
         
 3. DB : 광물 수집 경과에 대한 DB 를 쌓아 해당 task에 대한 사후평가 자료를 정리합니다.
 
@@ -70,7 +70,7 @@
 
 ---
 
-![mermaid-diagram (5).png](attachment:6db19557-388b-4974-a4fe-2078ccd829b5:mermaid-diagram_(5).png)
+![Flow Chart](images/mermaid-diagram-5.png)
 
 ## 💻 개발 환경(Environment)
 
