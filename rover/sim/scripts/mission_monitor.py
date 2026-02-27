@@ -5,13 +5,16 @@ mission_monitor.py — 미션 상태 터미널 모니터
   source /opt/ros/humble/setup.bash
   python3 scripts/mission_monitor.py
 """
+import csv
 import json
+import os
 import time
+from datetime import datetime
+
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
-import os
 
 
 def clear():
@@ -31,9 +34,41 @@ class MissionMonitor(Node):
         self.speeds     = {}   # {idx: float} m/s
 
         # 수집 통계용
-        self._start_time    = time.time()
-        self._prev_collected = {}  # {idx: int}
+        self._start_time     = time.time()
+        self._prev_collected = {}  # {idx: int}  — 이벤트 감지용
+        self._prev_round     = {}  # {idx: int}  — 베이스캠프 복귀 감지용
         self.collect_per_min = {}  # {idx: float}
+
+        # ── CSV 저장 설정 ────────────────────────────────────────────────────
+        self._ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        _script_dir  = os.path.dirname(os.path.abspath(__file__))
+        self._log_dir = os.path.normpath(
+            os.path.join(_script_dir, "..", "..", "analysis", "logs")
+        )
+        os.makedirs(self._log_dir, exist_ok=True)
+
+        # 이벤트 CSV (mineral_collect / basecamp_return)
+        _event_path = os.path.join(self._log_dir, f"mission_events_{self._ts}.csv")
+        self._event_f = open(_event_path, "w", newline="", encoding="utf-8")
+        self._event_w = csv.writer(self._event_f)
+        self._event_w.writerow(
+            ["elapsed_s", "event_type", "robot_id", "round", "mineral_num", "x", "y"]
+        )
+
+        # 시계열 로그 CSV (속도 / 거리 / 위치)
+        _log_path = os.path.join(self._log_dir, f"mission_log_{self._ts}.csv")
+        self._log_f = open(_log_path, "w", newline="", encoding="utf-8")
+        self._log_w = csv.writer(self._log_f)
+        self._log_w.writerow(
+            ["elapsed_s",
+             "r0_speed", "r0_distance", "r0_x", "r0_y",
+             "r1_speed", "r1_distance", "r1_x", "r1_y"]
+        )
+
+        print(f"[CSV] 저장 경로  : {self._log_dir}")
+        print(f"[CSV] 이벤트 파일: mission_events_{self._ts}.csv")
+        print(f"[CSV] 로그 파일  : mission_log_{self._ts}.csv")
+        # ─────────────────────────────────────────────────────────────────────
 
         self.create_subscription(String,      "/mission/status", self._on_status, 10)
         self.create_subscription(PoseStamped, "/robot0/pose", lambda m: self._on_pose(0, m), 10)
@@ -45,7 +80,38 @@ class MissionMonitor(Node):
         try:
             self.status = json.loads(msg.data)
         except Exception:
-            pass
+            return
+
+        elapsed = time.time() - self._start_time
+
+        for i in range(2):
+            st        = self.status.get(str(i), {})
+            collected = st.get("collected", 0)
+            round_num = st.get("round",     1)
+            x         = st.get("x")
+            y         = st.get("y")
+
+            prev_col = self._prev_collected.get(i, 0)
+            prev_rnd = self._prev_round.get(i,     1)
+
+            # 광물 수집 이벤트
+            if collected > prev_col:
+                self._event_w.writerow([
+                    round(elapsed, 3), "mineral_collect",
+                    i, round_num, collected, x, y,
+                ])
+                self._event_f.flush()
+
+            # 베이스캠프 복귀 이벤트 (라운드 증가 시)
+            if round_num > prev_rnd:
+                self._event_w.writerow([
+                    round(elapsed, 3), "basecamp_return",
+                    i, prev_rnd, "", x, y,
+                ])
+                self._event_f.flush()
+
+            self._prev_collected[i] = collected
+            self._prev_round[i]     = round_num
 
     def _on_pose(self, idx, msg):
         x = msg.pose.position.x
@@ -120,6 +186,19 @@ class MissionMonitor(Node):
         print("=" * 56)
         print("  Ctrl+C 로 종료")
 
+        # ── 시계열 로그 CSV 기록 ────────────────────────────────────────────
+        row = [round(elapsed, 3)]
+        for i in range(2):
+            st  = self.status.get(str(i), {})
+            pos = self.poses.get(i)
+            row.append(round(self.speeds.get(i) or 0.0, 4) if self.speeds.get(i) is not None else "")
+            row.append(round(st.get("distance") or 0.0, 4) if st.get("distance") is not None else "")
+            row.append(round(pos[0], 4) if pos else "")
+            row.append(round(pos[1], 4) if pos else "")
+        self._log_w.writerow(row)
+        self._log_f.flush()
+        # ─────────────────────────────────────────────────────────────────────
+
 
 def main():
     rclpy.init()
@@ -129,6 +208,9 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
+        node._event_f.close()
+        node._log_f.close()
+        print(f"\n[CSV] 저장 완료: {node._log_dir}")
         node.destroy_node()
         rclpy.shutdown()
 
